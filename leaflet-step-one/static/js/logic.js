@@ -15,7 +15,9 @@ L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 
 var link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson";
 
-
+function size(magnitude) {
+    return magnitude * 20000;
+};
 
 // Grabbing our GeoJSON data..
 d3.json(link, function (data) {
@@ -24,18 +26,37 @@ d3.json(link, function (data) {
 
     // createLocations(data.features);
     // // });
+    var location = data.features[i];
 
     for (var i = 0; i < data.features.length; i++) {
         var location = data.features[i];
-        console.log(data.features[i]);
+        //console.log(data.features[i]);
 
         if (location) {
             L.marker([location.geometry.coordinates[1], location.geometry.coordinates[0]]).addTo(map);
-            console.log([location.geometry.coordinates[1], location.geometry.coordinates[0]]);
-        
+            //console.log([location.geometry.coordinates[1], location.geometry.coordinates[0]]);
+
         }
+
+
+        L.geoJson(data, {
+            style: function (feature) {
+                return L.circle({
+                    radius: size(location.properties.mag),
+                    fillColor: "pink",
+                    fillOpacity: 0.75,
+                    weight: 0.5,
+                    color: "black"
+
+                });
+            }
+        }).addTo(map);
     }
 });
+
+
+
+
 
 // function createLocations(earthquakeData) {
 //      L.geoJSON(earthquakeData,
