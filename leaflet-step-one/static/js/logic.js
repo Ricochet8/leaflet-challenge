@@ -1,7 +1,8 @@
 // Creating map object
 var map = L.map("map", {
     center: [37.00, -95.00],
-    zoom: 3
+    zoom: 3,
+    //layers: [circleLayer]
 });
 
 // Adding tile layer
@@ -24,6 +25,10 @@ d3.json(link, function (data) {
 
     console.log(data);
 
+    function size(mag) {
+        return mag * 20000;
+    };
+
     // createLocations(data.features);
     // // });
     var location = data.features[i];
@@ -32,51 +37,61 @@ d3.json(link, function (data) {
         var location = data.features[i];
         //console.log(data.features[i]);
 
-        if (location) {
-            L.marker([location.geometry.coordinates[1], location.geometry.coordinates[0]]).addTo(map);
+        // if (location) {
+        //     var marker = L.marker([location.geometry.coordinates[1], location.geometry.coordinates[0]]).addTo(map);
             //console.log([location.geometry.coordinates[1], location.geometry.coordinates[0]]);
 
-        }
+        //}
+    
 
 
-        L.geoJson(data, {
-            style: function (feature) {
-                return L.circle({
-                    radius: size(location.properties.mag),
-                    fillColor: "pink",
-                    fillOpacity: 0.75,
-                    weight: 0.5,
-                    color: "black"
-
-                });
-            }
-        }).addTo(map);
     }
+
+    L.geoJSON(data, {
+
+
+        pointToLayer: function (data, latlng) {
+            return L.circle(latlng, { radius: size(location.properties.mag) });
+        },
+                style: function(location) {
+                    return {
+                        fillColor: chooseColor(location.properties.mag),
+                        color: "black",
+                        weight: 1,
+                        opacity: 0.75,
+                        fillOpacity: 0.8
+                    }
+                },
+    
+    
+    
+        
+    }).addTo(map);
 });
 
+function chooseColor(mag) {
+
+    if (mag < 1) {
+        return "yellow"
+    }
+    else if (mag < 2) {
+        return "red"
+    }
+    else if (mag < 3) {
+        return "orange"
+    }
+    else if (mag < 4) {
+        return "green"
+    }
+    else {
+        return "purple"
+    }
+
+
+};
 
 
 
-
-// function createLocations(earthquakeData) {
-//      L.geoJSON(earthquakeData,
-
-//         function (earthquakeData, latlng) {
-//             return L.circle(latlng, { radius: size(earthquakeData.properties.mag) });
-//         },
-
-//         function (geoJsonFeature) {
-//             return {
-//                 fillColor: circleColor(geoJsonFeature.properties.mag),
-//                 fillOpacity: 0.75,
-//                 weight: 0.5,
-//                 color: 'black'
-//             }
-//         },
-
-
-//     )
-// };
 
 
 
